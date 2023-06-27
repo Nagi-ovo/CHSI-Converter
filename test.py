@@ -28,7 +28,7 @@ def open_docx_on_desktop(file_path):
 
 # 创建根窗口
 root = Tk()
-root.title("PDF转换工具")
+root.title("EZ4STU")
 root.geometry("600x400")
 root.configure(bg='lightblue')
 
