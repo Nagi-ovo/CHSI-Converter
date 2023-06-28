@@ -1,10 +1,14 @@
 from tkinter import Tk, Button, Label, StringVar
 from tkinter.filedialog import askopenfilename
 from docx import Document
-import PyPDF2
+from docx.shared import Inches,Pt
 import os
 import subprocess
 import sys
+from extract_info import extract_info_from_pdf
+from extract_img import extract_image_from_pdf
+from add_float_picture import add_float_picture
+
 
 def open_docx_on_desktop(file_path):
     # 根据操作系统选择适当的命令
@@ -63,15 +67,26 @@ def convert_to_docx():
     path = file_path.get()
     if path:
         # 提取PDF中的文本内容
-        pdf_file = open(path, 'rb')
-        pdf_reader = PyPDF2.PdfReader(pdf_file)
-        text = ""
-        for page in pdf_reader.pages:
-            text += page.extract_text()
+        extracted_info = extract_info_from_pdf(path)
 
-        # 创建一个新的docx文档并将文本添加到段落中
-        doc = Document()
-        doc.add_paragraph(text)
+        # 提取PDF中的图片
+        cropped_image = extract_image_from_pdf(path, 1, 1898, 583, 2230, 1026)
+
+        # 用提取的信息和图片创建一个新的docx文档
+        doc = Document("template.docx")
+        
+        for key, value in extracted_info.items():
+            paragraph = doc.add_paragraph()
+            space_replace = key.replace(' ', '')
+            num_spaces = int(45 - (len(space_replace) * 2 + (len(key) - len(space_replace)) * 1))
+            run = paragraph.add_run(f"{key}{' ' * num_spaces}{value}\n")
+
+            print(len(space_replace) * 2 + (len(key) - len(space_replace)) * 1)
+
+            run.font.size = Pt(11)  # 设置字体大小
+            run.font.bold = True  # 设置字体为加粗
+
+        add_float_picture(doc.add_paragraph(), cropped_image, width=Inches(1.2), pos_x=Pt(430), pos_y=Pt(140))
 
         # 保存为docx文件
         output_path = path.replace(".pdf", ".docx")
@@ -79,20 +94,19 @@ def convert_to_docx():
 
         # 显示文件路径
         converted_file_path.set("已转换为DOCX文件：\n" + output_path)
-        print(output_path)
+
         # 打开生成的文件
-        root.after(3000, lambda: open_docx_on_desktop(output_path))
+        root.after(1500, lambda: open_docx_on_desktop(output_path))
         
     else:
-        file_path.set("请先选择要转换的PDF文件")
+        file_path.set("请先选择一个PDF文件")
 
 # 创建转换按钮
-convert_button = Button(root, text="转换为DOCX", command=convert_to_docx, font=("Arial", 16), bg='white', fg='black')
-convert_button.pack(pady=10)
+convert_button = Button(root, text="转换", command=convert_to_docx, font=("Arial", 16), bg='white', fg='black')
+convert_button.pack(pady=20)
 
-# 创建转换后的文件路径标签
+# 创建转换后文件路径标签
 converted_file_label = Label(root, textvariable=converted_file_path, font=("Arial", 14), bg='lightblue', fg='white')
 converted_file_label.pack(pady=10)
 
-# 运行主循环
 root.mainloop()
