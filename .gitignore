@@ -3,4 +3,5 @@ __pycache__/
 main.spec
 dist/
 build/
-ez4stu_doc.png
+src/doc*
+main.exe

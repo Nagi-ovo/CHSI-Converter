@@ -1,7 +1,7 @@
 import re
 import PyPDF2
 from pypinyin import lazy_pinyin
-from datetime import datetime
+
 
 def extract_text_from_pdf(pdf_path):
     pdf_file_obj = open(pdf_path, 'rb')
