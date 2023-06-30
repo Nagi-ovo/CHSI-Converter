@@ -11,3 +11,6 @@
 - 打开翻译后的文档，调整至大小合适
 
 ### 2.GitHub Profile
+
+可参考如下案例：
+<img src="https://thatwebsite.oss-cn-hongkong.aliyuncs.com/ez4stu_doc.png">
