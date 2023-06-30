@@ -48,14 +48,21 @@ def extract_info(patterns_dict, text):
             elif prop == 'Type':
                 results[prop] = 'General higher education'
             elif prop == 'School Status':
-                value = match.group(1)  # 预计毕业日期：2025年07月01日）
-                date_part = value.split("：")[1]  # 2025年07月01日）
+                value = match.group(1)  
+                date_part = value.split("：")[1]  
                 parts = date_part.split('年')
                 year = parts[0]
                 month_day = parts[1].split('月')
                 day = month_day[1].replace('日', '').replace('）', '')  # Remove trailing bracket from the day
                 formatted_date = month_day[0] + '/' + day + '/' + year
                 results[prop] = 'Student registration (Expected graduation date: ' + formatted_date + ')'
+            elif prop == 'Update Date':
+                value = match.group(1)  
+                parts = value.split('年')
+                year = parts[0]
+                month_day = parts[1].split('月')
+                formatted_date = month_day[0] + '/' + month_day[1].replace('日', '') + '/' + year
+                results[prop] = formatted_date
             else:
                 results[prop] = match.group(1)
         else:
@@ -69,6 +76,7 @@ def extract_info_from_pdf(path):
         return re.compile(r'{}\s*([^\s]*)'.format(pattern))
 
     patterns_dict = {
+        'Update Date': rc('更新日期：'),
         'Name': rc('姓名'),
         'Gender': rc('性别'),
         'Id Number': rc('证件号码'),
