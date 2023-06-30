@@ -73,7 +73,17 @@ def convert_to_docx():
         extracted_info = extract_info_from_pdf(path)
         doc = Document("template.docx")
 
+        # 创建一个新的段落来插入"更新日期"
+        paragraph = doc.add_paragraph()
+        # 将段落插入到表格之前（假设你的表格是文档的第一个元素）
+        doc.element.body.insert(1, paragraph._element)  
+        # 设置段落居中
+        paragraph.alignment = 1
+        # 添加"更新日期"
+        paragraph.add_run('Update date:' + extracted_info['Update Date'])
         
+        # 从字典中删除"更新日期"，防止其被添加到表格中
+        del extracted_info['Update Date']
 
         table = doc.add_table(rows=1, cols=2)
         table.autofit = False
@@ -107,7 +117,8 @@ def convert_to_docx():
         add_float_picture(doc.add_paragraph(), cropped_image_1, width=Inches(1.2), pos_x=Pt(430), pos_y=Pt(140))
 
         cropped_image_2 = extract_image_from_pdf(path, 1, 300, 2690, 630, 2985)
-        add_float_picture(doc.add_paragraph(), cropped_image_2, width=Inches(1.2), pos_x=Pt(78), pos_y=Pt(642))
+        add_float_picture(doc.add_paragraph(), cropped_image_2, width=Inches(1.2), pos_x=Pt(78), pos_y=Pt(643))
+        
         
         output_path = path.replace(".pdf", ".docx")
         doc.save(output_path)
