@@ -71,7 +71,7 @@ def convert_to_docx():
     path = file_path.get()
     if path:
         extracted_info = extract_info_from_pdf(path)
-        doc = Document("template.docx")
+        doc = Document("src/template.docx")
 
         # 创建一个新的段落来插入"更新日期"
         paragraph = doc.add_paragraph()

@@ -20,7 +20,10 @@ def extract_info(patterns_dict, text):
         match = re.search(pattern, text)
         if match:
             if prop == 'Name':
-                results[prop] = ''.join(lazy_pinyin(match.group(1))).title()
+                pinyin = lazy_pinyin(match.group(1))
+                first_char = pinyin[0].capitalize()
+                remaining_chars = ''.join(pinyin[1:]).capitalize()
+                results[prop] =  remaining_chars + ' ' + first_char
             elif prop == 'Gender':
                 if match.group(1) == '男':
                     results[prop] = 'Male'
