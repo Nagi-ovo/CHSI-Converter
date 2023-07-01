@@ -2,6 +2,8 @@
 
 用于将[学信档案](https://my.chsi.com.cn/archive/bab/index.action)一键转化为可用于[GitHub 学生认证](https://education.github.com/discount_requests/application)的英文版文件
 
+目前仅支持 Windows 用户
+
 ## 使用方法
 
 ### 1.python 运行
