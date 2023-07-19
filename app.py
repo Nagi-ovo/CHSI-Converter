@@ -12,8 +12,10 @@ from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.oxml.ns import nsdecls
 from docx.oxml import parse_xml
 import uuid
+import os
 
 app = Flask(__name__)
+
 
 # 你的转换函数
 
@@ -31,18 +33,17 @@ def convert_to_docx(path):
     table = doc.add_table(rows=1, cols=2)
     table.autofit = False
 
-
     for cell in table.columns[0].cells:
         cell.width = Inches(0.5)
     for cell in table.columns[1].cells:
         cell.width = Inches(5.0)
 
     border_xml = '<w:tcBorders xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">' \
-                '<w:top w:val="nil"/>' \
-                '<w:left w:val="nil"/>' \
-                '<w:bottom w:val="nil"/>' \
-                '<w:right w:val="nil"/>' \
-                '</w:tcBorders>'
+                 '<w:top w:val="nil"/>' \
+                 '<w:left w:val="nil"/>' \
+                 '<w:bottom w:val="nil"/>' \
+                 '<w:right w:val="nil"/>' \
+                 '</w:tcBorders>'
 
     for key, value in extracted_info.items():
         cells = table.add_row().cells
@@ -53,21 +54,20 @@ def convert_to_docx(path):
         cells[0].text = key
         cells[1].text = value + "\n"
 
-    cropped_image_1 = extract_image_from_pdf(path, 1, 1898, 583, 2230, 1026)
-    add_float_picture(doc.add_paragraph(), cropped_image_1, width=Inches(1.2), pos_x=Pt(430), pos_y=Pt(140))
+        cropped_image_1 = extract_image_from_pdf(path, 1, 1898, 583, 2230, 1026)
+        add_float_picture(doc.add_paragraph(), cropped_image_1, width=Inches(1.2), pos_x=Pt(430), pos_y=Pt(140))
 
-    cropped_image_2 = extract_image_from_pdf(path, 1, 300, 2690, 630, 2985)
-    add_float_picture(doc.add_paragraph(), cropped_image_2, width=Inches(1.2), pos_x=Pt(78), pos_y=Pt(643))
+        cropped_image_2 = extract_image_from_pdf(path, 1, 300, 2690, 630, 2985)
+        add_float_picture(doc.add_paragraph(), cropped_image_2, width=Inches(1.2), pos_x=Pt(78), pos_y=Pt(643))
 
-    output_path = path.replace(".pdf", ".docx")
-    doc.save(output_path)
+        output_path = path.replace(".pdf", ".docx")
+        doc.save(output_path)
 
-    return output_path
+        return output_path
 
 @app.route('/')
 def home():
     return render_template('index.html')
-
 
 @app.route('/convert', methods=['POST'])
 def convert_file():
@@ -78,7 +78,7 @@ def convert_file():
         return 'No selected file'
     if file:
         filename = secure_filename(file.filename)
-        filepath = os.path.join('upload', filename)
+        filepath = os.path.join(os.getcwd(), 'upload', filename)
         file.save(filepath)
 
         output_path = convert_to_docx(filepath)
@@ -92,4 +92,6 @@ def convert_file():
         return response
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000, host='0.0.0.0')
+else:
+    application=app
