@@ -1,15 +1,16 @@
 from pdf2image import convert_from_path
 from PIL import Image
+import os
 
 def extract_image_from_pdf(path, page_number, left, top, right, bottom):
     images = convert_from_path(path, dpi=300, first_page=page_number, last_page=page_number)
     image = images[0]
 
     cropped_image = image.crop((left, top, right, bottom))
-    image_path = path.replace(".pdf", "_image.png")
+    file_name = os.path.splitext(path)[0]  # 获取文件的基本名称（不包括扩展名）
+    image_path = f"{file_name}_image.png"  # 拼接新的文件路径，包括正确的扩展名
     cropped_image.save(image_path)  # 将截取的图片保存到同一路径下
     return image_path
-
 '''
 pdf_path = " "
 page_number = 1

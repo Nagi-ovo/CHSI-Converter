@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>PDF Converter</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: url("http://static.simpledesktops.com/uploads/desktops/2015/07/11/Yosemite-Color-Block.png") no-repeat center center fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px;
+        }
+        .custom-file-input::-webkit-file-upload-button {
+            visibility: hidden;
+        }
+        .custom-file-input::before {
+            content: 'Select PDF file';
+            display: inline-block;
+            background: -webkit-linear-gradient(top, #f9f9f9, #e3e3e3);
+            border: 1px solid #999;
+            border-radius: 3px;
+            padding: 10px 16px;
+            outline: none;
+            white-space: nowrap;
+            -webkit-user-select: none;
+            cursor: pointer;
+            text-shadow: 1px 1px #fff;
+            font-weight: 700;
+            font-size: 14pt;
+        }
+        .custom-file-input:hover::before {
+            border-color: black;
+        }
+        .custom-file-input:active::before {
+            background: -webkit-linear-gradient(top, #e3e3e3, #f9f9f9);
+        }
+        .form-control-lg {
+            height: calc(1.5em + 1.75rem + 2px);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container py-5">
+        <h2 class="text-center">Upload PDF</h2>
+        <form action="/convert" method="post" enctype="multipart/form-data" class="d-flex flex-column align-items-center mt-4">
+            <div class="custom-file mb-3 col-12 col-md-8 col-lg-6">
+                <input type="file" class="custom-file-input form-control-lg" id="customFile" name="file" accept=".pdf">
+                <label class="custom-file-label" for="customFile">Select PDF file</label>
+            </div>
+            <input type="submit" value="Convert and Download" class="btn btn-primary btn-lg">
+        </form>
+        <!-- Conversion success message, this should be filled in by Flask after a successful conversion -->
+        <div id="successMessage" class="mt-4 text-center text-success"></div>
+    </div>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+        document.querySelector('.custom-file-input').addEventListener('change', function() {
+            let fileName = this.value.split('\\').pop();
+            this.nextElementSibling.classList.add("selected");
+            this.nextElementSibling.innerHTML = fileName;
+        });
+        document.querySelector('.custom-file-input').addEventListener('blur', function() {
+            if (this.value === '') {
+                this.nextElementSibling.classList.remove("selected");
+                this.nextElementSibling.innerHTML = 'Select PDF file';
+            }
+        });
+    </script>
+</body>
+
+</html>

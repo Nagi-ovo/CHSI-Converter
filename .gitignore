@@ -1,7 +1,2 @@
 教育部*
-__pycache__/
-main.spec
-dist/
-build/
-src/doc*
-main.exe
+.idea

@@ -1,7 +1,0 @@
-python-docx
-pdf2image
-Pillow
-re
-PyPDF2
-pypinyin
-tkinter
