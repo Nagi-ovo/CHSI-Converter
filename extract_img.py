@@ -1,5 +1,5 @@
 from pdf2image import convert_from_path
-from PIL import Image
+
 import os
 
 def extract_image_from_pdf(path, page_number, left, top, right, bottom):
