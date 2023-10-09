@@ -47,3 +47,7 @@ Ministry of Education online verification report
 
 如果所有方式都不通过，试试其他的英文证明类型。
 接下来，就只需要静待消息了，你应该会在几分钟内收到结果。
+
+### 其它
+
+部分代码使用了[用python-docx创建浮动图片](https://blog.csdn.net/BF02jgtRS00XKtCx/article/details/111188806)中的方法，感谢文章作者！
