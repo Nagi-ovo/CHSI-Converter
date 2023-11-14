@@ -2,7 +2,9 @@
 
 本工具设计用于将[学信档案](https://my.chsi.com.cn/archive/bab/index.action)一键转化为可用于[GitHub 学生认证](https://education.github.com/discount_requests/application)的英文版文件。
 
-感谢大家的支持！如果在使用的过程中遇到问题请在 ISSUE 中提出，我们一起尽力解决！
+感谢大家的支持！如果该项目对你有帮助的话，请不吝啬给出⭐️
+
+如在使用的过程中遇到问题，请在 [Issues](https://github.com/Nagi-ovo/CHSI-Converter/issues) 中提出，我们一起尽力解决！
 
 ## 如何使用 🛠️
 
