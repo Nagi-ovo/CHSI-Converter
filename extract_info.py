@@ -1,11 +1,11 @@
 import re
-import PyPDF2
+from pypdf import PdfReader
 from pypinyin import lazy_pinyin
 
 
 def extract_text_from_pdf(pdf_path):
     pdf_file_obj = open(pdf_path, 'rb')
-    pdf_reader = PyPDF2.PdfReader(pdf_file_obj)
+    pdf_reader = PdfReader(pdf_file_obj)
 
     text = ""
     for page in pdf_reader.pages:
