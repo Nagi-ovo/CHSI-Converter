@@ -51,20 +51,19 @@ def convert_to_docx(path):
             cell._element.get_or_add_tcPr().append(parse_xml(border_xml))
             cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
 
-        is_last = key == list(extracted_info.keys())[-1]
-        cells[0].text = key + ("" if is_last else "\n") 
-        cells[1].text = value + ("" if is_last else "\n")
+        cells[0].text = key
+        cells[1].text = value + "\n"
 
-    cropped_image_1 = extract_image_from_pdf(path, 1, 1898, 583, 2230, 1026)
-    add_float_picture(doc.add_paragraph(), cropped_image_1, width=Inches(1.2), pos_x=Pt(430), pos_y=Pt(140))
+        cropped_image_1 = extract_image_from_pdf(path, 1, 1898, 583, 2230, 1026)
+        add_float_picture(doc.add_paragraph(), cropped_image_1, width=Inches(1.2), pos_x=Pt(430), pos_y=Pt(140))
 
-    cropped_image_2 = extract_image_from_pdf(path, 1, 300, 2690, 630, 2985)
-    add_float_picture(doc.add_paragraph(), cropped_image_2, width=Inches(1.2), pos_x=Pt(78), pos_y=Pt(643))
+        cropped_image_2 = extract_image_from_pdf(path, 1, 300, 2690, 630, 2985)
+        add_float_picture(doc.add_paragraph(), cropped_image_2, width=Inches(1.2), pos_x=Pt(78), pos_y=Pt(643))
 
-    output_path = path.replace(".pdf", ".docx")
-    doc.save(output_path)
+        output_path = path.replace(".pdf", ".docx")
+        doc.save(output_path)
 
-    return output_path
+        return output_path
 
 @app.route('/')
 def home():
