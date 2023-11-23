@@ -8,7 +8,7 @@
 
 ## 如何使用 🛠️
 
-- 离线转换：切换到"offline"分支或下载已有的Realse，本地运行即可(不建议下载Release，本人当时并未读过skywind大佬的打包秘籍，最后整出依托答辩)
+- 离线转换：(目前仅支持Windows，且需要具备`poppler`，在终端输入`pdftotext -v`即可检查)。切换到"offline"分支或下载已有的Realse，本地运行即可(不建议下载Release，本人当时并未读过skywind大佬的打包秘籍，最后整出依托答辩)
 
 - 在线转换：访问[网页端](http://www.ez4stu.nagi.fun/)进行一键转换并下载即可,排版可以微调；
 
