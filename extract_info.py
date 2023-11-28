@@ -2,7 +2,6 @@ import re
 from pypdf import PdfReader
 from pypinyin import lazy_pinyin
 
-
 def extract_text_from_pdf(pdf_path):
     pdf_file_obj = open(pdf_path, 'rb')
     pdf_reader = PdfReader(pdf_file_obj)
@@ -100,6 +99,9 @@ def extract_info_from_pdf(path):
     
     # 获取匹配的信息
     results = extract_info(patterns_dict, text)
+    
+    for prop, value in results.items():
+        print(f'{prop}: {value}')
     
     return results
 

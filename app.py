@@ -16,9 +16,6 @@ import os
 
 app = Flask(__name__)
 
-
-# 你的转换函数
-
 def convert_to_docx(path):
     extracted_info = extract_info_from_pdf(path)
     doc = Document("static/template.docx")
