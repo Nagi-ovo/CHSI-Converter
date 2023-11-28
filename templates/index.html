@@ -5,6 +5,9 @@
     <title>PDF Converter</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
             background: url("http://static.simpledesktops.com/uploads/desktops/2015/07/11/Yosemite-Color-Block.png") no-repeat center center fixed;
@@ -27,7 +30,7 @@
             padding: 10px 16px;
             outline: none;
             white-space: nowrap;
-            -webkit-user-select: none;
+            user-select: none;
             cursor: pointer;
             text-shadow: 1px 1px #fff;
             font-weight: 700;
@@ -41,6 +44,28 @@
         }
         .form-control-lg {
             height: calc(1.5em + 1.75rem + 2px);
+        }
+        footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+        background-color: rgba(108, 134, 202, 0.5);
+        backdrop-filter: blur(4px);
+        padding: 5px 0;
+        }
+
+        footer a {
+            color: #31bacf;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+
+        footer p {
+        margin: 5px 0;
+        font-size: 14px;
+        font-family: 'Roboto', sans-serif;
         }
     </style>
 </head>
@@ -73,6 +98,12 @@
             }
         });
     </script>
+<footer>
+    <a href="https://github.com/Nagi-ovo/CHSI-Converter">
+        <i class="fab fa-github"></i> Nagi-ovo/CHSI-Converter
+    </a>
+    <p>Made with 💗 by Nagi-ovo</p>
+</footer>
 </body>
 
 </html>
