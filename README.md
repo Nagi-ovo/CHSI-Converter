@@ -8,12 +8,13 @@
 
 ## 如何使用 🛠️
 
-- 本项目使用需要具备`poppler`，在终端输入`pdftotext -v`即可检查，不同操作系统可在google搜索下载方式。
+**如果无法正常使用麻烦你发起 Issue :)**
 
-**又重新部署了下，如果无法正常使用麻烦你发起 Issue :)**
 - 在线转换(推荐方式)：访问[网页端](http://www.ez4stu.nagi.fun/)进行一键转换并下载即可,排版可以微调；
 
-- 离线转换：。切换到"offline"分支或下载已有的Realse，本地运行即可(不建议下载Release，本人当时并未读过skywind大佬的打包秘籍，最后整出依托答辩)
+- 本地转换：需要具备`poppler`，在终端输入`pdftotext -v`即可检查，不同操作系统可在google搜索下载方式，MacOS建议使用`brew install poppler`；
+
+- 离线转换：GUI版本，同样需要`poppler`切换到"offline"分支或下载已有的Realse，本地运行即可(不建议下载Release，本人当时并未读过skywind大佬的打包秘籍，最后整出依托答辩)。
 
 或者，你也可以通过 Docker 进行部署。
 
