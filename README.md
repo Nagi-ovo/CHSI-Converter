@@ -18,6 +18,10 @@
 
 或者，你也可以通过 Docker 进行部署。
 
+## 可以自主排查的问题 🐛
+
+- [Word 使用了黑色主题+黑色背景，导致白字被浅色背景遮住以为转换失败](https://github.com/Nagi-ovo/CHSI-Converter/pull/5#issuecomment-1829653930)，属实难绷。
+
 ## 认证流程 📋
 
 参考[知乎用户啦啦啦的回答](https://zhuanlan.zhihu.com/p/618772237)
