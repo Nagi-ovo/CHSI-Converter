@@ -34,7 +34,7 @@
 
 ### 第二步. GitHub 个人简介 🐙
 
-你可以参考下面的示例：
+你可以参考下面的示例：(注意，这里我“@Open-BJUT”只是随便加的，并非必须有这部分，写一遍学校名字就够了)
 <img src="https://thatwebsite.oss-cn-hongkong.aliyuncs.com/ez4stu_doc.png">
 
 ### 第三步. 申请认证 📱
