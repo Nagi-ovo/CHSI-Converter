@@ -71,6 +71,13 @@
 </head>
 
 <body>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
     <div class="container py-5">
         <h2 class="text-center">Upload PDF</h2>
         <form action="/convert" method="post" enctype="multipart/form-data" class="d-flex flex-column align-items-center mt-4">
