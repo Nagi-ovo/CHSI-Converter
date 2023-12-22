@@ -10,3 +10,4 @@ pypdf==3.17.1
 pypinyin==0.42.0
 python-docx==0.8.11
 Werkzeug==2.2.2
+dotenv
