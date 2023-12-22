@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
  
 # filename: add_float_picture.py
+
+from flask import flash 
  
 '''
 Implement floating image based on python-docx.
@@ -89,10 +91,15 @@ def new_pic_anchor(part, image_descriptor, width, height, pos_x, pos_y):
     return CT_Anchor.new_pic_anchor(shape_id, rId, filename, cx, cy, pos_x, pos_y)
 # refer to docx.text.run.add_picture
 def add_float_picture(p, image_path_or_stream, width=None, height=None, pos_x=0, pos_y=0):
-    """Add float picture at fixed position `pos_x` and `pos_y` to the top-left point of page.
-    """
-    run = p.add_run()
-    anchor = new_pic_anchor(run.part, image_path_or_stream, width, height, pos_x, pos_y)
-    run._r.add_drawing(anchor)
+    try:
+        """Add float picture at fixed position `pos_x` and `pos_y` to the top-left point of page.
+        """
+        run = p.add_run()
+        anchor = new_pic_anchor(run.part, image_path_or_stream, width, height, pos_x, pos_y)
+        run._r.add_drawing(anchor)
+    except Exception as e:
+        flash(f"浮动图片添加时发生错误:{e}")
+        raise
+
 # refer to docx.oxml.__init__.py
 register_element_cls('wp:anchor', CT_Anchor)

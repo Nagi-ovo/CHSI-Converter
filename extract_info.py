@@ -1,17 +1,22 @@
 import re
 from pypdf import PdfReader
 from pypinyin import lazy_pinyin
+from flask import flash
 
 def extract_text_from_pdf(pdf_path):
-    pdf_file_obj = open(pdf_path, 'rb')
-    pdf_reader = PdfReader(pdf_file_obj)
+    try:
+        pdf_file_obj = open(pdf_path, 'rb')
+        pdf_reader = PdfReader(pdf_file_obj)
 
-    text = ""
-    for page in pdf_reader.pages:
-        text += page.extract_text()
+        text = ""
+        for page in pdf_reader.pages:
+            text += page.extract_text()
 
-    pdf_file_obj.close()
-    return text
+        pdf_file_obj.close()
+        return text
+    except Exception as e:
+        flash(f"从PDF提取文本错误:{e}")
+        raise
 
 def extract_info(patterns_dict, text):
     results = {}
@@ -100,8 +105,8 @@ def extract_info_from_pdf(path):
     # 获取匹配的信息
     results = extract_info(patterns_dict, text)
     
-    for prop, value in results.items():
-        print(f'{prop}: {value}')
+    # for prop, value in results.items():
+    #   print(f'{prop}: {value}')
     
     return results
 
