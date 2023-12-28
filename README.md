@@ -18,9 +18,11 @@
 
 或者，你也可以通过 Docker 进行部署。
 
-## 可以自主排查的问题 🐛
+## 可以自主排查的问题（务必阅读） 🐛
 
-- [Word 使用了黑色主题+黑色背景，导致白字被浅色背景遮住以为转换失败](https://github.com/Nagi-ovo/CHSI-Converter/pull/5#issuecomment-1829653930)，属实难绷。
+- 不要对要传入的学习网档案原文件进行修改，尤其是**文件名**和其中的内容。详情可见[这个Issue](https://github.com/Nagi-ovo/CHSI-Converter/issues/13)。
+
+- [Word 使用了黑色主题+黑色背景，导致白字被浅色背景遮住以为转换失败](https://github.com/Nagi-ovo/CHSI-Converter/issues/7)，属实难绷。
 
 ## 认证流程 📋
 
