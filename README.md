@@ -72,3 +72,10 @@ Ministry of Education online verification report
 ### 其它
 
 部分代码使用了[用python-docx创建浮动图片](https://blog.csdn.net/BF02jgtRS00XKtCx/article/details/111188806)中的方法，感谢文章作者！
+
+
+### Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Nagi-ovo/CHSI-Converter&type=Date)](https://star-history.com/#Nagi-ovo/CHSI-Converter&Date)
+
+
