@@ -6,6 +6,9 @@
 
 如在使用的过程中遇到问题，请在 [Issues](https://github.com/Nagi-ovo/CHSI-Converter/issues) 中提出，我们一起尽力解决！
 
+## 前排提醒！！！
+### 405 Method Not Allow 八成是因为你传入的档案是修改后的，去学习网重新下一份什么都不要改
+
 ## 如何使用 🛠️
 
 **如果无法正常使用麻烦你发起 Issue :)**
