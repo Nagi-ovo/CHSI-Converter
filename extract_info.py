@@ -1,7 +1,7 @@
 import re
 from pypdf import PdfReader
 from pypinyin import lazy_pinyin
-from flask import flash
+from flask import make_response
 
 def extract_text_from_pdf(pdf_path):
     try:
@@ -15,8 +15,7 @@ def extract_text_from_pdf(pdf_path):
         pdf_file_obj.close()
         return text
     except Exception as e:
-        flash(f"从PDF提取文本错误:{e}")
-        raise
+        return make_response("<script>alert('从PDF提取文本错误'); window.location.href = document.referrer;</script>")
 
 def extract_info(patterns_dict, text):
     results = {}
