@@ -1,5 +1,5 @@
 from docx.oxml import OxmlElement
-from flask import Flask, request, send_file, render_template, send_from_directory, make_response, flash, redirect
+from flask import Flask, request, send_file, render_template, send_from_directory, make_response, redirect
 from werkzeug.utils import secure_filename
 import os
 from add_float_picture import add_float_picture
@@ -11,17 +11,11 @@ from docx.shared import Inches, Pt
 from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.oxml.ns import nsdecls
 from docx.oxml import parse_xml
-from dotenv import load_dotenv
 import uuid
 import os
 
-load_dotenv()
 
 app = Flask(__name__)
-
-# Session 密钥
-app.secret_key = os.environ.get('FLASK_SECRET_KEY')
-app.debug = os.environ.get('FLASK_DEBUG') == '1'
 
 def convert_to_docx(path):
     try:
@@ -82,22 +76,17 @@ def home():
 @app.route('/convert', methods=['POST'])
 def convert_file():
     if 'file' not in request.files:
-        flash('缺少文件部分')
-        return redirect(request.url)
+        return make_response("<script>alert('缺少文件部分'); window.location.href = document.referrer;</script>")
 
     file = request.files['file']
-
     if file.filename == '':
-        flash('没有选中的文件')
-        return redirect(request.url)
+        return make_response("<script>alert('没有选中的文件'); window.location.href = document.referrer;</script>")
 
     if not file.filename.lower().endswith('.pdf'):
-        flash('只接受 PDF 文件')
-        return redirect(request.url)
+        return make_response("<script>alert('只接受 PDF 文件'); window.location.href = document.referrer;</script>")
 
     if not file.filename.startswith('教育部学籍在线验证报告_'):
-        flash('请不要传入无关文件')
-        return redirect(request.url)
+        return make_response("<script>alert('请不要传入无关文件'); window.location.href = document.referrer;</script>")
     
     try:
         filename = secure_filename(file.filename)
@@ -112,10 +101,24 @@ def convert_file():
 
         response = make_response(send_from_directory(directory, filename, as_attachment=True))
         response.headers["Content-Disposition"] = f"attachment; filename={output_filename}"
+        
+        # 隐私处理
+        upload_folder = os.path.join(os.getcwd(), 'upload')
+        for filename in os.listdir(upload_folder):
+            if filename != 'holder': 
+                file_path = os.path.join(upload_folder, filename)
+                try:
+                    if os.path.isfile(file_path) or os.path.islink(file_path):
+                        os.unlink(file_path)
+                    elif os.path.isdir(file_path):
+                        shutil.rmtree(file_path)
+                except Exception as e:
+                    print(f"Failed to delete {file_path}. Reason: {e}")
+        
         return response
     except Exception as e:
-        flash(f"处理时发生错误: {e}")
-        return redirect(request.url)
+        return make_response("<script>alert('处理文件时发生错误'); window.location.href = document.referrer;</script>")
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001, host='0.0.0.0')
