@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>PDF Converter</title>
+    <title>CHSI-Converter</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -79,7 +79,8 @@
         {% endif %}
     {% endwith %}
     <div class="container py-5">
-        <h2 class="text-center">Upload PDF</h2>
+        <h2 class="text-center">请务必上传原始的<a href="https://my.chsi.com.cn/archive/bab/index.action" target="_blank">学信档案</a>(没有做过任何改动)</h2>
+        <h3 class="text-center">您的文件会在下载后立即从服务器上删除</h3>
         <form action="/convert" method="post" enctype="multipart/form-data" class="d-flex flex-column align-items-center mt-4">
             <div class="custom-file mb-3 col-12 col-md-8 col-lg-6">
                 <input type="file" class="custom-file-input form-control-lg" id="customFile" name="file" accept=".pdf">
