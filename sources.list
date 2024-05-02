@@ -1,4 +1,10 @@
-deb http://mirrors.cloud.tencent.com/debian/ buster main non-free contrib
-deb http://mirrors.cloud.tencent.com/debian-security buster/updates main
-deb http://mirrors.cloud.tencent.com/debian/ buster-updates main non-free contrib
-deb http://mirrors.cloud.tencent.com/debian/ buster-backports main non-free contrib
+# 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster main contrib non-free
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ buster main contrib non-free
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-updates main contrib non-free
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-updates main contrib non-free
+# 下行的 release 失效了
+# deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-backports main contrib non-free
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-backports main contrib non-free
+deb https://mirrors.tuna.tsinghua.edu.cn/debian-security buster/updates main contrib non-free
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian-security buster/updates main contrib non-free
