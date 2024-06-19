@@ -1,0 +1,13 @@
+version: '3.9'
+
+services:
+  chsi_converter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_ENV: production
+    volumes:
+      - .:/app

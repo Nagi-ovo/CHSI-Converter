@@ -11,3 +11,4 @@ pypinyin==0.42.0
 python-docx==0.8.11
 Werkzeug==2.2.2
 python-dotenv
+gunicorn==22.0.0
