@@ -21,8 +21,8 @@ def extract_image_from_pdf(path, page_number, left, top, right, bottom):
         cropped_image.save(image_path)  # 将截取的图片保存到同一路径下
         return image_path
     except Exception as e:
-        return make_response("<script>alert('从PDF提取图片错误'); window.location.href = document.referrer;</script>")
-        
+        return make_response(f"<script>alert('从PDF提取图片错误: {e}'); window.location.href = document.referrer;</script>")
+
 
 
 

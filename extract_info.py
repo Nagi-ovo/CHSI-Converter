@@ -15,7 +15,7 @@ def extract_text_from_pdf(pdf_path):
         pdf_file_obj.close()
         return text
     except Exception as e:
-        return make_response("<script>alert('从PDF提取文本错误'); window.location.href = document.referrer;</script>")
+        return make_response(f"<script>alert('从PDF提取文本错误: {e}'); window.location.href = document.referrer;</script>")
 
 def extract_info(patterns_dict, text):
     results = {}

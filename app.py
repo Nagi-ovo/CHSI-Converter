@@ -1,19 +1,15 @@
-from docx.oxml import OxmlElement
-from flask import Flask, request, send_file, render_template, send_from_directory, make_response, redirect
+from flask import Flask, request, render_template, send_from_directory, make_response
 from werkzeug.utils import secure_filename
 import os
 from add_float_picture import add_float_picture
 from extract_img import extract_image_from_pdf
 from extract_info import extract_info_from_pdf
-import sys
 from docx import Document
 from docx.shared import Inches, Pt
 from docx.enum.table import WD_ALIGN_VERTICAL
-from docx.oxml.ns import nsdecls
 from docx.oxml import parse_xml
 import uuid
-import os
-
+import shutil  # 确保引入shutil模块
 
 app = Flask(__name__)
 
@@ -66,8 +62,7 @@ def convert_to_docx(path):
         return output_path
     
     except Exception as e:
-        flash(f"Error during DOCX conversion:{e}")
-        raise
+        return make_response(f"<script>alert('Error during DOCX conversion: {e}'); window.location.href = document.referrer;</script>")
 
 @app.route('/')
 def home():
@@ -105,7 +100,7 @@ def convert_file():
         # 隐私处理
         upload_folder = os.path.join(os.getcwd(), 'upload')
         for filename in os.listdir(upload_folder):
-            if filename != 'holder': 
+            if filename != '.gitkeep': 
                 file_path = os.path.join(upload_folder, filename)
                 try:
                     if os.path.isfile(file_path) or os.path.islink(file_path):
@@ -117,8 +112,7 @@ def convert_file():
         
         return response
     except Exception as e:
-        return make_response("<script>alert('处理文件时发生错误'); window.location.href = document.referrer;</script>")
-
+        return make_response(f"<script>alert('处理文件时发生错误: {e}'); window.location.href = document.referrer;</script>")
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001, host='0.0.0.0')
