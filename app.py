@@ -9,7 +9,7 @@ from docx.shared import Inches, Pt
 from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.oxml import parse_xml
 import uuid
-import shutil  # 确保引入shutil模块
+import shutil
 
 app = Flask(__name__)
 
@@ -115,6 +115,8 @@ def convert_file():
         return make_response(f"<script>alert('处理文件时发生错误: {e}'); window.location.href = document.referrer;</script>")
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001, host='0.0.0.0')
+    debug_mode = os.getenv('FLASK_DEBUG', 'false').lower() == 'true'
+    port = int(os.getenv('FLASK_PORT', 5001))
+    app.run(debug=debug_mode, port=port, host='0.0.0.0')
 else:
     application=app
