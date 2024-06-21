@@ -37,7 +37,7 @@ if [ "$(docker ps -aq -f name=$CONTAINER_NAME)" ]; then
 fi
 
 echo "启动新的容器..."
-docker run -d -p 5000:5000 --name $CONTAINER_NAME $IMAGE_NAME
+docker run -d -p 5000:80 --name $CONTAINER_NAME $IMAGE_NAME
 
 if [ "$(docker ps -q -f name=$CONTAINER_NAME)" ]; then
     echo "部署成功！应用正在运行。"
