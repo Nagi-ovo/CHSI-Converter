@@ -12,5 +12,5 @@ RUN python -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/sim
     pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ -r requirements.txt && \
     apt-get update && \
     apt-get install -y poppler-utils vim
-
-ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0:5000", "--timeout", "120", "app:app"]
+    
+ENTRYPOINT ["python","app.py"]
