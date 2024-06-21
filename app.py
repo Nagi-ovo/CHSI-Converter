@@ -115,8 +115,8 @@ def convert_file():
         return make_response(f"<script>alert('处理文件时发生错误: {e}'); window.location.href = document.referrer;</script>")
 
 if __name__ == '__main__':
-    debug_mode = os.getenv('FLASK_DEBUG', 'false').lower() == 'true'
+    # debug_mode = os.getenv('FLASK_DEBUG', 'false').lower() == 'true'
     port = int(os.getenv('FLASK_PORT', 5001))
-    app.run(debug=debug_mode, port=port, host='0.0.0.0')
+    app.run(debug=True, port=port, host='0.0.0.0')
 else:
     application=app
