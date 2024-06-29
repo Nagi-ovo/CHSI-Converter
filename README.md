@@ -19,7 +19,7 @@
 
 - 离线转换：GUI版本，同样需要`poppler`切换到"offline"分支或下载已有的Realse，本地运行即可(不建议下载Release，本人当时并未读过skywind大佬的打包秘籍，最后整出依托答辩)。
 
-或者，你也可以通过 Docker 进行部署。
+或者，你也可以通过 Docker 自行部署，运行项目中的 `deploy.sh` 即可一键部署。
 
 ## 可以自主排查的问题（务必阅读） 🐛
 
@@ -44,7 +44,7 @@
 
 此外，只是保险起见才使用的实名，并非必须。
 
-<img src="https://thatwebsite.oss-cn-hongkong.aliyuncs.com/ez4stu_doc.png">
+![doc-2](https://jsd.cdn.zzko.cn/gh/Nagi-ovo/picx-images-hosting@master/docs/chsi-converter/doc-2.2rv08cdhhm.jpg)
 
 ### 第三步. 申请认证 📱
 
@@ -52,10 +52,10 @@
   [点击这里进行认证](https://education.github.com/discount_requests/application)
 
 - 选择“我是学生”
-  <img src="https://thatwebsite.oss-cn-hongkong.aliyuncs.com/doc_1.jpg">
+![doc-1](https://jsd.cdn.zzko.cn/gh/Nagi-ovo/picx-images-hosting@master/docs/chsi-converter/doc-1.9rj9q8mg83.jpg)
 
 - 按照下图进行操作(教育邮箱一般可在学校邮箱中心申请)
-  <img src="https://thatwebsite.oss-cn-hongkong.aliyuncs.com/doc_2.png">
+![doc-3](https://jsd.cdn.zzko.cn/gh/Nagi-ovo/picx-images-hosting@master/docs/chsi-converter/doc-3.1e8h4b1osr.jpg)
 
 ### 第四步. 提交证明 📸
 
