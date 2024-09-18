@@ -9,6 +9,8 @@
 
 ## 本项目不会保留你的隐私信息！！！
 
+https://github.com/Nagi-ovo/CHSI-Converter/blob/6d5a9c70c53c44a0dfb71d635adfe3063c6549fe/utils.py#L250-L261
+
 ## 如何使用 🛠️
 
 **如果无法正常使用麻烦你发起 Issue :)**
