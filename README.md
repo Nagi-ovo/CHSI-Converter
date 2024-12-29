@@ -29,6 +29,14 @@ https://github.com/Nagi-ovo/CHSI-Converter/blob/6d5a9c70c53c44a0dfb71d635adfe306
 
 - [Word 使用了黑色主题+黑色背景，导致白字被浅色背景遮住以为转换失败](https://github.com/Nagi-ovo/CHSI-Converter/issues/7)，属实难绷。
 
+- 个人姓名，请注意First Name为名，Last Name为姓。在修改[profile](https://github.com/settings/profile)和[账单信息](https://github.com/settings/billing/payment_information)时请注意。
+
+- 学校名修改成英文，见[issue#18](https://github.com/Nagi-ovo/CHSI-Converter/issues/18).
+
+- ~~*请选择你的拍屏导师.jpg*~~ 认证网页上传**图片**时不要使用截图，否则会出现`Please use your device camera to submit academic affiliation documents.`错误。解决方案：拍摄打印件或屏幕后上传照片。~~如果出现摩尔纹地狱可以将生成word文件的底纹去掉。~~
+
+- 修改文件名。直接上传文件可能出现`Please select proof type 'Other' for this image.`错误，参照[知乎用户张周怡的方法](https://zhuanlan.zhihu.com/p/665726757)将文件名改为`Certification.jpg`可解决。
+
 ## 认证流程 📋
 
 参考[知乎用户啦啦啦的回答](https://zhuanlan.zhihu.com/p/618772237)
