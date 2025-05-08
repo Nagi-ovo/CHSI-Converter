@@ -7,6 +7,9 @@
 
 如在使用的过程中遇到问题，请在 [Issues](https://github.com/Nagi-ovo/CHSI-Converter/issues) 中提出，我们一起尽力解决！
 
+> [!warning]
+> 警示：本项目仅供学习研究，不适用于正式场合。请勿用于学籍认证、留学申请等重要用途，后果自负。
+
 ## 本项目不会保留你的隐私信息！！！
 
 https://github.com/Nagi-ovo/CHSI-Converter/blob/6d5a9c70c53c44a0dfb71d635adfe3063c6549fe/utils.py#L250-L261
@@ -17,7 +20,7 @@ https://github.com/Nagi-ovo/CHSI-Converter/blob/6d5a9c70c53c44a0dfb71d635adfe306
 
 - 在线转换(推荐方式)：访问[网页端](http://www.ez4stu.nagi.fun/)进行一键转换并下载即可,排版可以微调；
 
-- 本地转换：需要具备`poppler`，在终端输入`pdftotext -v`即可检查，不同操作系统可在google搜索下载方式，MacOS建议使用`brew install poppler`；
+- 本地转换：需要具备`poppler`，在终端输入`pdftotext -v`即可检查，不同操作系统可在 google 搜索下载方式，MacOS建议使用`brew install poppler`；
 
 - 离线转换（由于模板更新，现已无法正常转换）：GUI版本，同样需要`poppler`切换到"offline"分支或下载已有的Realse，本地运行即可(不建议下载Release，本人当时并未读过skywind大佬的打包秘籍，最后整出依托答辩)。
 
@@ -25,13 +28,15 @@ https://github.com/Nagi-ovo/CHSI-Converter/blob/6d5a9c70c53c44a0dfb71d635adfe306
 
 ## 可以自主排查的问题（务必阅读） 🐛
 
+- 转换后发现学校、专业没有翻译：因为我没有做这个功能，没有精力维护一个中英对照数据库，故留给使用者自己写，也方便保证信息正确。详见[issue#18](https://github.com/Nagi-ovo/CHSI-Converter/issues/18).
+
+- 转换后排版有问题：技术能力有限所以需要手动拖一下文字列的位置，欢迎大佬来 fix。
+
 - 不要对要传入的学习网档案原文件进行修改，尤其是**文件名**和其中的内容。详情可见[这个Issue](https://github.com/Nagi-ovo/CHSI-Converter/issues/13)。
 
-- [Word 使用了黑色主题+黑色背景，导致白字被浅色背景遮住以为转换失败](https://github.com/Nagi-ovo/CHSI-Converter/issues/7)，属实难绷。
+- [Word 使用了黑色主题+黑色背景，导致白字被浅色背景遮住以为转换失败](https://github.com/Nagi-ovo/CHSI-Converter/issues/7)，我也遇到这过这个问题，属实难绷。
 
-- 个人姓名，请注意First Name为名，Last Name为姓。在修改[profile](https://github.com/settings/profile)和[账单信息](https://github.com/settings/billing/payment_information)时请注意。
-
-- 学校名修改成英文，见[issue#18](https://github.com/Nagi-ovo/CHSI-Converter/issues/18).
+- 个人姓名，请注意 First Name 为名，Last Name 为姓。在修改[profile](https://github.com/settings/profile)和[账单信息](https://github.com/settings/billing/payment_information)时请注意。
 
 - ~~*请选择你的拍屏导师.jpg*~~ 认证网页上传**图片**时不要使用截图，否则会出现`Please use your device camera to submit academic affiliation documents.`错误。解决方案：拍摄打印件或屏幕后上传照片。~~如果出现摩尔纹地狱可以将生成word文件的底纹去掉。~~
 
@@ -84,8 +89,8 @@ Ministry of Education online verification report
 
 ### 其它
 
-部分代码使用了[用python-docx创建浮动图片](https://blog.csdn.net/BF02jgtRS00XKtCx/article/details/111188806)中的方法，感谢文章作者！
-
+- 部分代码使用了[用python-docx创建浮动图片](https://blog.csdn.net/BF02jgtRS00XKtCx/article/details/111188806)中的方法，感谢文章作者！
+- 由于精力有限目前转换后的美观程度一般，实在抱歉，欢迎大佬来优化！
 
 ### Star History
 
