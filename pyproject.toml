@@ -21,3 +21,8 @@ dependencies = [
     "gunicorn==22.0.0",
     "ruff",
 ]
+
+[[tool.uv.index]]
+name = "tsinghua"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+default = true
