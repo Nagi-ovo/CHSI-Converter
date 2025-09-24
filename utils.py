@@ -290,11 +290,6 @@ class CHSIConverter:
                 "<script>alert('只接受 PDF 文件'); window.location.href = document.referrer;</script>"
             )
 
-        if not file.filename.startswith("教育部学籍在线验证报告_"):
-            return make_response(
-                "<script>alert('请不要传入无关文件'); window.location.href = document.referrer;</script>"
-            )
-
         try:
             filename = secure_filename(file.filename)
             filepath = os.path.join(os.getcwd(), "upload", filename)
