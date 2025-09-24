@@ -9,7 +9,7 @@ COPY . .
 COPY ./sources.list /etc/apt/sources.list
 
 RUN python -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple && \
-    pip install uv && \ 
+    pip install uv -i https://pypi.tuna.tsinghua.edu.cn/simple && \ 
     uv sync && \
     apt-get update && \
     apt-get install -y poppler-utils vim
