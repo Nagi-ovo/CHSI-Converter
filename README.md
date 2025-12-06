@@ -22,6 +22,12 @@ https://github.com/Nagi-ovo/CHSI-Converter/blob/6d5a9c70c53c44a0dfb71d635adfe306
 
 - 本地转换：需要具备`poppler`，在终端输入`pdftotext -v`即可检查，不同操作系统可在 google 搜索下载方式，MacOS建议使用`brew install poppler`；
 
+```bash
+git clone https://github.com/Nagi-ovo/CHSI-Converter.git && cd CHSI-Converter
+uv sync
+uv run app.py
+```
+
 - 离线转换（由于模板更新，现已无法正常转换）：GUI版本，同样需要`poppler`切换到"offline"分支或下载已有的Realse，本地运行即可(不建议下载Release，本人当时并未读过skywind大佬的打包秘籍，最后整出依托答辩)。
 
 或者，你也可以通过 Docker 自行部署，运行项目中的 `deploy.sh` 即可一键部署。
