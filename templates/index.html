@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>学籍报告英文翻译</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 48px 20px; background: #f3f5f7; color: #263238;
+               font: 16px/1.65 system-ui, sans-serif; }
+        main { max-width: 620px; margin: auto; padding: 32px; background: white;
+               border: 1px solid #dde3e7; border-radius: 12px; }
+        h1 { margin: 0 0 12px; font-size: 26px; line-height: 1.35; }
+        p { margin: 12px 0; }
+        a { color: #075f89; text-underline-offset: 3px; }
+        label { display: block; margin-top: 12px; font-weight: 600; }
+        input { width: 100%; padding: 10px; font: inherit; border: 1px solid #aab6bf;
+                border-radius: 5px; }
+        input[type=file] { margin: 8px 0 20px; }
+        details { margin-bottom: 24px; }
+        summary { cursor: pointer; color: #075f89; }
+        button { width: 100%; padding: 12px; border: 0; border-radius: 5px;
+                 background: #075f89; color: white; font: inherit; font-weight: 600; cursor: pointer; }
+        button:hover { background: #054b6d; }
+        :focus-visible { outline: 3px solid #5b9fbd; outline-offset: 3px; }
+        .hint { color: #52626d; font-size: 14px; }
+        .error { padding: 12px; color: #8b1f1f; background: #fff0ee; border: 1px solid #e5b3ac; }
+        @media (max-width: 480px) { body { padding: 20px 12px; } main { padding: 24px 20px; } }
+    </style>
+</head>
+<body>
+<main>
+    <h1>学籍报告英文翻译</h1>
+    <p>把报告文字翻译成英文，保留原 PDF 的背景、边框、照片和二维码。</p>
+    <p class="hint">请上传从 <a href="https://my.chsi.com.cn/archive/bab/index.action" target="_blank" rel="noreferrer">学信档案</a> 下载的单页 A4 原始学籍在线验证报告，大小不超过 5 MB。</p>
+    <p class="hint">文件仅用于本次转换，处理结束后自动删除。生成的文件是辅助翻译。</p>
+    {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+    <form action="/convert" method="post" enctype="multipart/form-data" autocomplete="off">
+        <label for="report-file">选择原始 PDF</label>
+        <input type="file" id="report-file" name="file" accept=".pdf,application/pdf" required>
+        <details {% if error %}open{% endif %}>
+            <summary>补充英文译名（可选）</summary>
+            <p class="hint">学校、专业或院系没有可靠译名时，请填写正式英文名。也可以指定姓名拼写。</p>
+            {% for field, label in [('institution', '学校英文名'), ('major', '专业英文名'), ('department', '院系英文名'), ('english_name', '姓名英文拼写')] %}
+                <label for="{{ field }}">{{ label }}</label>
+                <input id="{{ field }}" name="{{ field }}" maxlength="200" value="{{ request.form.get(field, '') }}">
+            {% endfor %}
+        </details>
+        <button type="submit">翻译并下载 PDF</button>
+    </form>
+</main>
+</body>
+</html>

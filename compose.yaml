@@ -1,0 +1,22 @@
+services:
+  converter:
+    image: chsi-converter:${CHSI_RELEASE:-local}
+    build: .
+    container_name: chsi-converter-${CHSI_RELEASE:-local}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${CHSI_PORT:-8002}:5000"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=128m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 768m
+    pids_limit: 128
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

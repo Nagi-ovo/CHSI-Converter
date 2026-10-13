@@ -1,0 +1,27 @@
+name: Check converter
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.11.7"
+      - run: uv sync --locked --python 3.12
+      - run: uv export --frozen --no-dev --no-emit-project --no-header --no-annotate --format requirements.txt | diff - requirements.txt
+      - run: uv run ruff check . && uv run ruff format --check .
+      - run: uv run pytest -q
+      - run: docker build -t chsi-converter:ci .
+      - run: |
+          docker run -d --name chsi-ci --read-only --tmpfs /tmp:rw,noexec,nosuid,size=128m -p 127.0.0.1:8002:5000 chsi-converter:ci
+          for attempt in $(seq 1 20); do
+            if curl -fsS http://127.0.0.1:8002/healthz; then exit 0; fi
+            sleep 1
+          done
+          docker logs chsi-ci
+          exit 1
