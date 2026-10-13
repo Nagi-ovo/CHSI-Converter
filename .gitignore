@@ -7,3 +7,18 @@ pdf_image.png
 .venv
 
 .egg-info
+.pytest_cache/
+.ruff_cache/
+.env
+.env.*
+!.env.example
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.pdf
+*.docx
+*.png
+preview/
+output/
+upload/
