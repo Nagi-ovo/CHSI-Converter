@@ -69,10 +69,7 @@ uv run app.py
 
 此外，只是保险起见才使用的实名，并非必须。
 
-```text
-Name: 与学籍报告一致的姓名
-Bio: Student at your university
-```
+![doc-2](https://cdn.jsdelivr.net/gh/Nagi-ovo/picx-images-hosting@master/docs/chsi-converter/doc-2.2rv08cdhhm.jpg)
 
 ### 第三步. 申请认证 📱
 
