@@ -1,6 +1,11 @@
 FROM python:3.12.13-slim-bookworm
 WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends --only-upgrade ca-certificates liblzma5 \
+    && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' ca-certificates)" ge '20250419~deb12u2' \
+    && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' liblzma5)" ge '5.4.1-1+deb12u2' \
+    && rm -rf /var/lib/apt/lists/*
 ARG PYPI_INDEX_URL=https://pypi.org/simple
 COPY requirements.txt ./
 RUN pip install --no-cache-dir --require-hashes --only-binary=:all: \
