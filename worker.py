@@ -2,16 +2,13 @@
 
 import json
 import sys
-import traceback
 from pathlib import Path
 
 from converter import CHSIConverter, ConversionError
 
 
-def write_error(folder, code, diagnostic, trace=None, details=None):
+def write_error(folder, code, diagnostic, details=None):
     payload = {"code": code, "diagnostic": diagnostic}
-    if trace:
-        payload["traceback"] = trace[-16_000:]
     if details:
         payload["details"] = details
     (folder / "error.json").write_text(json.dumps(payload), encoding="utf-8")
@@ -32,7 +29,6 @@ def main():
             source.parent,
             error.code,
             error.diagnostic,
-            traceback.format_exc() if __debug__ else None,
             error.details,
         )
         return 1
@@ -40,8 +36,7 @@ def main():
         write_error(
             source.parent,
             "failed",
-            f"unexpected worker error: {type(error).__name__}: {error}",
-            traceback.format_exc(),
+            f"unexpected worker error: {type(error).__name__}",
         )
         return 1
     return 0

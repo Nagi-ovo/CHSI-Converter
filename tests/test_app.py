@@ -120,15 +120,67 @@ def test_missing_translation_page_shows_field_status(tmp_path):
     assert list(tmp_path.iterdir()) == []
 
 
-def test_unsupported_report_logs_diagnostic(caplog, tmp_path):
+def test_unsupported_report_logs_only_safe_metadata(caplog, tmp_path):
     report = synthetic_report(include_title=False)
     app = create_app({"TESTING": True, "DEBUG": True, "TEMP_ROOT": str(tmp_path)})
     with caplog.at_level(logging.INFO):
         result = app.test_client().post("/convert", data={"file": (BytesIO(report), "report.pdf")})
     assert result.status_code == 422
     assert "outcome=unsupported_report" in caplog.text
-    assert "title=False" in caplog.text
-    assert "detected_labels=" in caplog.text
-    assert "Name" in caplog.text
-    assert "worker traceback:" in caplog.text
+    assert "diagnostic=" not in caplog.text
+    assert "traceback" not in caplog.text
+    assert list(tmp_path.iterdir()) == []
+
+
+@pytest.mark.parametrize("debug", [False, True])
+def test_worker_exception_does_not_log_personal_fields(caplog, tmp_path, debug):
+    from pypdf import PdfWriter
+    from reportlab.pdfgen.canvas import Canvas
+
+    marker = "1996/02/03_PRIVATE_SENTINEL"
+    report = synthetic_report()
+    overlay = BytesIO()
+    page = Canvas(overlay)
+    page.setFont("STSong-Light", 10)
+    page.drawString(60, 440, "出生日期")
+    page.drawString(179, 440, marker)
+    page.save()
+    writer = PdfWriter(clone_from=BytesIO(report))
+    writer.pages[0].merge_page(PdfReader(BytesIO(overlay.getvalue())).pages[0])
+    document = BytesIO()
+    writer.write(document)
+    document.seek(0)
+    app = create_app({"TESTING": True, "DEBUG": debug, "TEMP_ROOT": str(tmp_path)})
+    with caplog.at_level(logging.INFO):
+        result = app.test_client().post("/convert", data={"file": (document, "report.pdf")})
+    assert result.status_code == 500
+    assert "outcome=failed" in caplog.text
+    assert marker not in caplog.text
+    assert marker not in result.get_data(as_text=True)
+    assert list(tmp_path.iterdir()) == []
+
+
+@pytest.mark.parametrize("debug", [False, True])
+def test_application_exception_does_not_log_report_values(caplog, tmp_path, report_pdf, debug):
+    marker = "PRIVATE_APPLICATION_SENTINEL"
+
+    def failing_converter(*_args):
+        raise ValueError(marker)
+
+    app = create_app(
+        {
+            "TESTING": True,
+            "DEBUG": debug,
+            "TEMP_ROOT": str(tmp_path),
+            "CONVERTER": failing_converter,
+        }
+    )
+    with caplog.at_level(logging.INFO):
+        result = app.test_client().post(
+            "/convert", data={"file": (BytesIO(report_pdf), "report.pdf")}
+        )
+    assert result.status_code == 500
+    assert "outcome=failed" in caplog.text
+    assert marker not in caplog.text
+    assert marker not in result.get_data(as_text=True)
     assert list(tmp_path.iterdir()) == []

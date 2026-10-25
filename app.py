@@ -40,13 +40,11 @@ class JobError(Exception):
         code: str,
         status: int,
         diagnostic: str = "",
-        traceback: str = "",
         details=None,
     ):
         super().__init__(diagnostic or code)
         self.code, self.status = code, status
         self.diagnostic = diagnostic or code
-        self.traceback = traceback
         self.details = details or {}
 
 
@@ -67,7 +65,6 @@ def run_conversion(source: Path, output: Path, timeout: float) -> None:
     if process.returncode:
         code = "failed"
         diagnostic = f"conversion worker exited with status {process.returncode}"
-        worker_traceback = ""
         details = {}
         error_file = source.parent / "error.json"
         if error_file.is_file() and error_file.stat().st_size < 64_000:
@@ -76,21 +73,18 @@ def run_conversion(source: Path, output: Path, timeout: float) -> None:
                 if isinstance(payload, dict):
                     code = payload.get("code", "failed")
                     diagnostic = payload.get("diagnostic", diagnostic)
-                    worker_traceback = payload.get("traceback", "")
                     worker_details = payload.get("details", {})
                     if isinstance(worker_details, dict):
                         details = worker_details
             except (ValueError, OSError):
                 pass
         diagnostic = " ".join(str(diagnostic).split())[:300]
-        worker_traceback = str(worker_traceback)[-16_000:]
         if code not in ERRORS:
             code = "failed"
         raise JobError(
             code,
             422 if code != "failed" else 500,
             diagnostic,
-            worker_traceback,
             details,
         )
 
@@ -181,8 +175,6 @@ def create_app(test_config=None):
         if not slot.acquire(blocking=False):
             return failure("busy", 503)
         outcome = "failed"
-        diagnostic = "-"
-        worker_traceback = ""
         details = {}
         try:
             files = request.files.getlist("file")
@@ -228,37 +220,23 @@ def create_app(test_config=None):
             return response
         except JobError as error:
             outcome = error.code
-            diagnostic = error.diagnostic
-            worker_traceback = error.traceback
             details = error.details
             return failure(error.code, error.status, details)
         except RequestEntityTooLarge:
             outcome = "too_large"
-            diagnostic = "request exceeded the 5 MB limit"
             raise
-        except Exception as error:
+        except Exception:
             outcome = "failed"
-            diagnostic = " ".join(
-                f"unhandled application error: {type(error).__name__}: {error}".split()
-            )[:300]
-            if app.debug:
-                app.logger.exception("conversion id=%s application error", request_id)
             return failure("failed", 500)
         finally:
             slot.release()
+            # Exception text and tracebacks can contain uploaded personal data.
             app.logger.info(
-                "conversion id=%s outcome=%s duration_ms=%d diagnostic=%s",
+                "conversion id=%s outcome=%s duration_ms=%d",
                 request_id,
                 outcome,
                 round((time.monotonic() - started) * 1000),
-                diagnostic,
             )
-            if app.debug and worker_traceback:
-                app.logger.error(
-                    "conversion id=%s worker traceback:\n%s",
-                    request_id,
-                    worker_traceback,
-                )
 
     return app
 
