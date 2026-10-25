@@ -120,6 +120,15 @@ class CHSIConverter:
     @classmethod
     def extract_info_from_pdf(cls, path):
         text = cls.extract_text_from_pdf(path)
+        try:
+            # pypdf may insert newlines between touching text objects. Reuse
+            # their visual runs so split field values are not silently cut off.
+            spans = text_origins(PdfReader(path).pages[0])
+            text = "\n".join(span["text"] for span in spans)
+        except Exception:
+            # Inspection may still extract fields from an unsupported layout;
+            # conversion independently validates every original text position.
+            pass
         labels = {
             "Update Date": ("更新日期",),
             "Name": ("姓名",),
