@@ -1,26 +1,66 @@
+# OS and editor files
 .DS_Store
-教育部*
-.idea
-__pycache__
-pdf
-pdf_image.png
-.venv
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+$null
 
-.egg-info
+# Python, testing, and coverage
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
 .pytest_cache/
 .ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.ipynb_checkpoints/
+
+# Local environment
 .env
 .env.*
 !.env.example
+
+# Archives, logs, and temporary backups
 *.tar
 *.tar.gz
 *.tgz
 *.zip
+*.log
+*.tmp
+*.bak
+*.orig
+*.rej
+*.json.[0-9]*
+~$*
+
+# Personal reports and generated files
+教育部*
+pdf
+pdf_image.png
 *.pdf
+*.doc
 *.docx
+*.xls
+*.xlsx
 *.png
+*.jpg
+*.jpeg
 preview/
 output/
 upload/
 
-!static/yosemite-color-block.png
+# Keep project image assets
+!static/**/*.png
+!static/**/*.jpg
+!static/**/*.jpeg

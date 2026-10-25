@@ -9,7 +9,7 @@ from reportlab.pdfbase.cidfonts import UnicodeCIDFont
 from reportlab.pdfgen.canvas import Canvas
 
 
-def synthetic_report(branch=None):
+def synthetic_report(branch=None, include_title=True):
     """Artificial data with original artwork and separate label/value positions."""
     pdfmetrics.registerFont(UnicodeCIDFont("STSong-Light"))
     stream = BytesIO()
@@ -17,8 +17,9 @@ def synthetic_report(branch=None):
     page.setStrokeColorRGB(0.2, 0.6, 0.5)
     page.rect(25, 25, 545, 792)
     page.drawImage(ImageReader(Image.new("RGB", (10, 10), "blue")), 455, 600, 80, 100)
-    page.setFont("STSong-Light", 20)
-    page.drawString(180, 768, "教育部学籍在线验证报告")
+    if include_title:
+        page.setFont("STSong-Light", 20)
+        page.drawString(180, 768, "教育部学籍在线验证报告")
     page.setFont("STSong-Light", 10)
     page.drawString(220, 746, "更新日期：2024年1月15日")
     for index, (label, value) in enumerate(
