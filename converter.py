@@ -24,8 +24,11 @@ UNIVERSITY_NAMES = json.loads(
 
 
 class ConversionError(Exception):
-    def __init__(self, code):
+    def __init__(self, code, diagnostic=None, details=None):
+        super().__init__(diagnostic or code)
         self.code = code
+        self.diagnostic = diagnostic or code
+        self.details = details or {}
 
 
 class CHSIConverter:
@@ -34,9 +37,11 @@ class CHSIConverter:
         try:
             reader = PdfReader(pdf_path)
             if reader.is_encrypted:
-                raise ConversionError("encrypted_pdf")
+                raise ConversionError("encrypted_pdf", "PDF is encrypted")
             if not 1 <= len(reader.pages) <= 10:
-                raise ConversionError("too_complex")
+                raise ConversionError(
+                    "too_complex", f"expected 1-10 pages, found {len(reader.pages)}"
+                )
             first = reader.pages[0]
             scale = float(first.user_unit) * 300 / 72
             width, height = (
@@ -44,15 +49,22 @@ class CHSIConverter:
                 float(first.mediabox.height) * scale,
             )
             if width <= 0 or height <= 0 or width * height > 12_000_000:
-                raise ConversionError("too_complex")
+                raise ConversionError(
+                    "too_complex",
+                    f"page area exceeds limit: width={width:.1f}, height={height:.1f}",
+                )
             text = "\n".join(page.extract_text() or "" for page in reader.pages)
             if len(text) > 1_000_000:
-                raise ConversionError("too_complex")
+                raise ConversionError(
+                    "too_complex", f"extracted text exceeds limit: chars={len(text)}"
+                )
             return text
         except ConversionError:
             raise
-        except Exception:
-            raise ConversionError("invalid_pdf") from None
+        except Exception as error:
+            raise ConversionError(
+                "invalid_pdf", f"PDF parser failed: {type(error).__name__}: {error}"
+            ) from None
 
     @staticmethod
     def extract_info(patterns_dict, text):
@@ -108,6 +120,15 @@ class CHSIConverter:
     @classmethod
     def extract_info_from_pdf(cls, path):
         text = cls.extract_text_from_pdf(path)
+        try:
+            # pypdf may insert newlines between touching text objects. Reuse
+            # their visual runs so split field values are not silently cut off.
+            spans = text_origins(PdfReader(path).pages[0])
+            text = "\n".join(span["text"] for span in spans)
+        except Exception:
+            # Inspection may still extract fields from an unsupported layout;
+            # conversion independently validates every original text position.
+            pass
         labels = {
             "Update Date": ("更新日期",),
             "Name": ("姓名",),
@@ -116,6 +137,7 @@ class CHSIConverter:
             "Ethnic": ("民族",),
             "Date of Birth": ("出生日期",),
             "Institution": ("学校名称", "院校"),
+            "Branch": ("分院",),
             "Levels": ("层次",),
             "Faculties": ("系所", "院系"),
             "Class": ("班级",),
@@ -130,14 +152,21 @@ class CHSIConverter:
             "Date of Leaving Institution": ("离校日期", "毕业日期"),
             "Verification Code": ("在线验证码",),
         }
-        patterns = {
-            prop: re.compile(
-                r"(?<![\u4e00-\u9fff])(?:{})[：:]*\s*([^\s]+)".format(
-                    "|".join(re.escape(label) for label in alternatives)
-                )
+        all_labels = "|".join(
+            re.escape(label)
+            for label in sorted(
+                {label for alternatives in labels.values() for label in alternatives},
+                key=len,
+                reverse=True,
             )
-            for prop, alternatives in labels.items()
-        }
+        )
+        patterns = {}
+        for prop, alternatives in labels.items():
+            label_pattern = "|".join(re.escape(label) for label in alternatives)
+            patterns[prop] = re.compile(
+                rf"(?<![\u4e00-\u9fff])(?:{label_pattern})[：:]*\s*"
+                rf"(?!(?:{all_labels})[：:]*(?:\s|$))([^\s]+)"
+            )
         info = cls.extract_info(patterns, text)
         # Exact names only: similar institution names must never be conflated.
         info["Institution"] = UNIVERSITY_NAMES.get(info["Institution"], info["Institution"])
@@ -152,25 +181,74 @@ class CHSIConverter:
 
     @classmethod
     def convert_to_pdf(cls, path, output_path, overrides=None):
+        output_path = Path(output_path)
         info = cls.extract_info_from_pdf(path)
-        if any(not info.get(key) for key in ["Update Date", "Name", "Institution"]):
-            raise ConversionError("unsupported_report")
+        required_fields = ["Update Date", "Name", "Institution"]
+        missing_fields = [key for key in required_fields if not info.get(key)]
+        if missing_fields:
+            raise ConversionError(
+                "unsupported_report",
+                f"required fields missing: {', '.join(missing_fields)}",
+            )
         overrides = overrides or {}
         for key, value in overrides.items():
-            if key not in {"Institution", "Major", "Faculties", "Name"}:
-                raise ConversionError("invalid_translation")
+            if key not in {"Institution", "Branch", "Major", "Faculties", "Name"}:
+                raise ConversionError("invalid_translation", f"unsupported override field: {key}")
             if not value or len(value) > 200 or any(ord(char) < 32 for char in value):
-                raise ConversionError("invalid_translation")
+                raise ConversionError(
+                    "invalid_translation",
+                    f"invalid override value for {key}: length={len(value)}",
+                )
             if re.search(r"[\u4e00-\u9fff]", value):
-                raise ConversionError("invalid_translation")
+                raise ConversionError(
+                    "invalid_translation", f"override for {key} contains Chinese characters"
+                )
             info[key] = value
 
         # Never invent official institution, major or department names.
-        if any(re.search(r"[\u4e00-\u9fff]", value or "") for value in info.values()):
-            raise ConversionError("missing_translation")
+        untranslated_fields = [
+            key for key, value in info.items() if re.search(r"[\u4e00-\u9fff]", value or "")
+        ]
+        if untranslated_fields:
+            field_status = []
+            for key, label in [
+                ("Institution", "学校"),
+                ("Branch", "分院"),
+                ("Major", "专业"),
+                ("Faculties", "院系"),
+                ("Name", "姓名"),
+            ]:
+                value = info.get(key)
+                if not value:
+                    state = "not_present"
+                    display_value = ""
+                elif re.search(r"[\u4e00-\u9fff]", value):
+                    state = "needs_input"
+                    display_value = value
+                else:
+                    state = "recognized"
+                    display_value = value
+                display_value = str(display_value)
+                if len(display_value) > 160:
+                    display_value = display_value[:157] + "..."
+                field_status.append(
+                    {
+                        "key": key,
+                        "label": label,
+                        "state": state,
+                        "value": display_value,
+                    }
+                )
+            raise ConversionError(
+                "missing_translation",
+                f"untranslated fields: {', '.join(untranslated_fields)}",
+                {"translation_fields": field_status},
+            )
         writer = PdfWriter(clone_from=path)
         if len(writer.pages) != 1:
-            raise ConversionError("unsupported_report")
+            raise ConversionError(
+                "unsupported_report", f"expected exactly 1 page, found {len(writer.pages)}"
+            )
         page = writer.pages[0]
         # Translation keeps artwork and trusted verification links, not active PDF actions.
         for key in ["/OpenAction", "/AA", "/Names", "/AcroForm"]:
@@ -195,14 +273,29 @@ class CHSIConverter:
         page[NameObject("/Annots")] = ArrayObject(links)
         width, height = float(page.mediabox.width), float(page.mediabox.height)
         if page.rotation or abs(width - 595) > 3 or abs(height - 842) > 3:
-            raise ConversionError("unsupported_report")
+            raise ConversionError(
+                "unsupported_report",
+                "expected unrotated A4 page: "
+                f"width={width:.1f}, height={height:.1f}, rotation={page.rotation}",
+            )
         try:
             spans = text_origins(page)
-        except Exception:
-            raise ConversionError("unsupported_report") from None
+        except Exception as error:
+            raise ConversionError(
+                "unsupported_report",
+                f"text layout probe failed: {type(error).__name__}: {error}",
+            ) from None
         labels = [span for span in spans if span["text"] in LABELS and span["x"] < 130]
-        if not labels or not any(s["text"] == "教育部学籍在线验证报告" for s in spans):
-            raise ConversionError("unsupported_report")
+        title_found = any(s["text"] == "教育部学籍在线验证报告" for s in spans)
+        if not labels or not title_found:
+            detected_labels = (
+                ", ".join(sorted({LABELS[span["text"]][0] for span in labels})) or "none"
+            )
+            raise ConversionError(
+                "unsupported_report",
+                "report markers not found: "
+                f"title={title_found}, labels={len(labels)}, detected_labels={detected_labels}",
+            )
 
         code_label = next((s for s in spans if s["text"] == "在线验证码"), None)
         code_value = next((s for s in spans if s["text"] == info["Verification Code"]), None)
@@ -240,12 +333,18 @@ class CHSIConverter:
             try:
                 text.encode("cp1252")
             except UnicodeEncodeError:
-                raise ConversionError("invalid_translation") from None
+                raise ConversionError(
+                    "invalid_translation",
+                    f"translated text is not cp1252 encodable: chars={len(text)}",
+                ) from None
             font = "Helvetica-Bold" if bold else "Helvetica"
             text_width = stringWidth(text, font, size)
             size *= min(1, available / max(text_width, 1))
             if size < 6:
-                raise ConversionError("translation_too_long")
+                raise ConversionError(
+                    "translation_too_long",
+                    f"translated text cannot fit at minimum font size: chars={len(text)}",
+                )
             drawing.setFillColorRGB(*color)
             drawing.setFont(font, size)
             if centered:
@@ -293,10 +392,17 @@ class CHSIConverter:
                 _english, key = LABELS[label["text"]]
                 value = info.get(key) if key else None
                 if value is None and re.search(r"[\u4e00-\u9fff]", text):
-                    raise ConversionError("unsupported_report")
+                    raise ConversionError(
+                        "unsupported_report",
+                        f"no value mapping for label={_english}, y={y:.1f}",
+                    )
                 draw(value or text, x, y, size, width - x - (145 if y > height * 0.65 else 60))
             elif re.search(r"[\u4e00-\u9fff]", text):
-                raise ConversionError("unsupported_report")
+                raise ConversionError(
+                    "unsupported_report",
+                    "unmapped Chinese text: "
+                    f"length={len(text)}, x={x:.1f}, y={y:.1f}, size={size:.1f}",
+                )
             else:
                 draw(text, x, y, size, width - x - 50, color=span["color"], bold=span["bold"])
 
@@ -314,4 +420,5 @@ class CHSIConverter:
                 "/Subject": "Unofficial translation; verify with the original CHSI report.",
             }
         )
+        output_path.parent.mkdir(parents=True, exist_ok=True)
         writer.write(output_path)

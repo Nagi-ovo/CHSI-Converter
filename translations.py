@@ -12,7 +12,7 @@ LABELS = {
     "学制": ("Length of study", "Educational System"),
     "学历类别": ("Education type", "Type"),
     "学习形式": ("Mode of study", "Form"),
-    "分院": ("Branch", None),
+    "分院": ("Branch", "Branch"),
     "系所": ("Department", "Faculties"),
     "院系": ("Department", "Faculties"),
     "入学日期": ("Enrollment date", "Date of Enrollment"),

@@ -1,6 +1,14 @@
 FROM python:3.12.13-slim-bookworm
 WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+ARG DEBIAN_MIRROR=deb.debian.org
+RUN sed -i "s|deb\.debian\.org|${DEBIAN_MIRROR}|g" /etc/apt/sources.list.d/debian.sources \
+    && apt-get -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 -o Acquire::Retries=2 update \
+    && apt-get -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 -o Acquire::Retries=2 \
+        install -y --no-install-recommends --only-upgrade ca-certificates liblzma5 \
+    && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' ca-certificates)" ge '20250419~deb12u2' \
+    && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' liblzma5)" ge '5.4.1-1+deb12u2' \
+    && rm -rf /var/lib/apt/lists/*
 ARG PYPI_INDEX_URL=https://pypi.org/simple
 COPY requirements.txt ./
 RUN pip install --no-cache-dir --require-hashes --only-binary=:all: \

@@ -28,6 +28,16 @@
         :focus-visible { outline: 3px solid #5b9fbd; outline-offset: 3px; }
         .hint { color: #52626d; font-size: 14px; }
         .error { padding: 12px; color: #8b1f1f; background: #fff0ee; border: 1px solid #e5b3ac; }
+        .field-status { margin: 18px 0 24px; padding: 16px; border: 1px solid #dde3e7;
+                        border-radius: 8px; background: #f7fafb; }
+        .field-status h2 { margin: 0 0 8px; font-size: 18px; }
+        .field-status ul { margin: 12px 0 0; padding: 0; list-style: none; }
+        .field-status li { margin-top: 8px; padding: 8px 10px; border-radius: 5px;
+                           background: white; }
+        .field-status .recognized { border-left: 4px solid #2e7d5a; }
+        .field-status .needs_input { border-left: 4px solid #b36b00; }
+        .field-status .not_present { border-left: 4px solid #9aa8b1; color: #52626d; }
+        .field-status .value { color: #52626d; overflow-wrap: anywhere; }
         @media (max-width: 480px) { body { padding: 20px 12px; } main { padding: 24px 20px; } }
     </style>
 </head>
@@ -38,13 +48,33 @@
     <p class="hint">请上传从 <a href="https://my.chsi.com.cn/archive/bab/index.action" target="_blank" rel="noreferrer">学信档案</a> 下载的单页 A4 原始学籍在线验证报告，大小不超过 5 MB。</p>
     <p class="hint">文件仅用于本次转换，处理结束后自动删除。生成的文件是辅助翻译。</p>
     {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+    {% if field_status %}
+    <section class="field-status" aria-label="译名识别结果">
+        <h2>译名识别结果</h2>
+        <p class="hint">标为“需要补充”的项目请填写正式英文名；“已识别”以及“报告中未提供”的项目可以留空。</p>
+        <ul>
+            {% for field in field_status %}
+            <li class="{{ field.state }}">
+                <strong>{{ field.label }}</strong>：
+                {% if field.state == 'recognized' %}
+                    已识别 <span class="value">（{{ field.value }}）</span>
+                {% elif field.state == 'needs_input' %}
+                    需要补充英文名 <span class="value">（当前：{{ field.value }}）</span>
+                {% else %}
+                    报告中未提供，可留空
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
     <form action="/convert" method="post" enctype="multipart/form-data" autocomplete="off">
         <label for="report-file">选择原始 PDF</label>
         <input type="file" id="report-file" name="file" accept=".pdf,application/pdf" required>
         <details {% if error %}open{% endif %}>
             <summary>补充英文译名（可选）</summary>
-            <p class="hint">学校、专业或院系没有可靠译名时，请填写正式英文名。也可以指定姓名拼写。</p>
-            {% for field, label in [('institution', '学校英文名'), ('major', '专业英文名'), ('department', '院系英文名'), ('english_name', '姓名英文拼写')] %}
+            <p class="hint">学校、分院、专业或院系没有可靠译名时，请填写正式英文名。也可以指定姓名拼写。</p>
+            {% for field, label in [('institution', '学校英文名'), ('branch', '分院英文名'), ('major', '专业英文名'), ('department', '院系英文名'), ('english_name', '姓名英文拼写')] %}
                 <label for="{{ field }}">{{ label }}</label>
                 <input id="{{ field }}" name="{{ field }}" maxlength="200" value="{{ request.form.get(field, '') }}">
             {% endfor %}

@@ -26,7 +26,7 @@ ERRORS = {
     "timeout": "转换超时。请检查报告是否为原始文件，稍后重试。",
     "busy": "当前正在处理另一份报告，请稍后重试。",
     "failed": "暂时无法完成转换，请稍后重试。",
-    "missing_translation": "部分字段暂无可靠英文译名。请补充学校、专业或院系英文名后重试。",
+    "missing_translation": "部分字段暂无可靠英文译名。请补充学校、分院、专业或院系英文名后重试。",
     "invalid_translation": (
         "补充译名请使用常用拉丁字母、数字和标点，不超过 200 个字符。姓名拼音请不加声调。"
     ),
@@ -35,8 +35,17 @@ ERRORS = {
 
 
 class JobError(Exception):
-    def __init__(self, code: str, status: int):
+    def __init__(
+        self,
+        code: str,
+        status: int,
+        diagnostic: str = "",
+        details=None,
+    ):
+        super().__init__(diagnostic or code)
         self.code, self.status = code, status
+        self.diagnostic = diagnostic or code
+        self.details = details or {}
 
 
 def run_conversion(source: Path, output: Path, timeout: float) -> None:
@@ -52,18 +61,32 @@ def run_conversion(source: Path, output: Path, timeout: float) -> None:
     except subprocess.TimeoutExpired:
         os.killpg(process.pid, signal.SIGKILL)
         process.wait()
-        raise JobError("timeout", 504) from None
+        raise JobError("timeout", 504, f"conversion worker exceeded {timeout:g} seconds") from None
     if process.returncode:
         code = "failed"
+        diagnostic = f"conversion worker exited with status {process.returncode}"
+        details = {}
         error_file = source.parent / "error.json"
-        if error_file.is_file() and error_file.stat().st_size < 1024:
+        if error_file.is_file() and error_file.stat().st_size < 64_000:
             try:
-                code = json.loads(error_file.read_text()).get("code", "failed")
+                payload = json.loads(error_file.read_text(encoding="utf-8"))
+                if isinstance(payload, dict):
+                    code = payload.get("code", "failed")
+                    diagnostic = payload.get("diagnostic", diagnostic)
+                    worker_details = payload.get("details", {})
+                    if isinstance(worker_details, dict):
+                        details = worker_details
             except (ValueError, OSError):
                 pass
+        diagnostic = " ".join(str(diagnostic).split())[:300]
         if code not in ERRORS:
             code = "failed"
-        raise JobError(code, 422 if code != "failed" else 500)
+        raise JobError(
+            code,
+            422 if code != "failed" else 500,
+            diagnostic,
+            details,
+        )
 
 
 def create_app(test_config=None):
@@ -71,18 +94,52 @@ def create_app(test_config=None):
     app.config.from_mapping(
         MAX_CONTENT_LENGTH=5 * 1024 * 1024,
         MAX_FORM_MEMORY_SIZE=256 * 1024,
-        MAX_FORM_PARTS=5,
+        MAX_FORM_PARTS=6,
         CONVERSION_TIMEOUT=45,
         TEMP_ROOT=os.environ.get("CHSI_TEMP_ROOT"),
         CONVERTER=run_conversion,
     )
     if test_config:
         app.config.update(test_config)
+    if app.config["TEMP_ROOT"]:
+        Path(app.config["TEMP_ROOT"]).mkdir(parents=True, exist_ok=True)
     slot = threading.BoundedSemaphore(1)
     app.logger.setLevel(logging.INFO)
 
-    def failure(code, status):
-        response = app.make_response((render_template("index.html", error=ERRORS[code]), status))
+    def field_status(details):
+        if not isinstance(details, dict):
+            return []
+        items = details.get("translation_fields", [])
+        if not isinstance(items, list):
+            return []
+        statuses = []
+        for item in items[:5]:
+            if not isinstance(item, dict):
+                continue
+            state = item.get("state")
+            if state not in {"recognized", "needs_input", "not_present"}:
+                continue
+            statuses.append(
+                {
+                    "key": str(item.get("key", ""))[:40],
+                    "label": str(item.get("label", ""))[:20],
+                    "state": state,
+                    "value": str(item.get("value", ""))[:160],
+                }
+            )
+        return statuses
+
+    def failure(code, status, details=None):
+        response = app.make_response(
+            (
+                render_template(
+                    "index.html",
+                    error=ERRORS[code],
+                    field_status=field_status(details),
+                ),
+                status,
+            )
+        )
         if status == 503:
             response.headers["Retry-After"] = "10"
         return response
@@ -118,23 +175,29 @@ def create_app(test_config=None):
         if not slot.acquire(blocking=False):
             return failure("busy", 503)
         outcome = "failed"
+        details = {}
         try:
             files = request.files.getlist("file")
             if len(files) != 1 or len(request.files) != 1:
-                raise JobError("invalid_file", 400)
+                raise JobError(
+                    "invalid_file",
+                    400,
+                    f"expected exactly one upload, files={len(files)}, parts={len(request.files)}",
+                )
             upload = files[0]
             if not upload.filename or Path(upload.filename).suffix.lower() != ".pdf":
-                raise JobError("invalid_file", 400)
+                raise JobError("invalid_file", 400, "upload filename is not a PDF")
             with tempfile.TemporaryDirectory(prefix="chsi-", dir=app.config["TEMP_ROOT"]) as folder:
                 source, output = Path(folder) / "input.pdf", Path(folder) / "output.pdf"
                 upload.save(source)
                 with source.open("rb") as stream:
                     if stream.read(5) != b"%PDF-":
-                        raise JobError("invalid_pdf", 422)
+                        raise JobError("invalid_pdf", 422, "missing %PDF- file signature")
                 overrides = {
                     key: request.form[field].strip()
                     for field, key in {
                         "institution": "Institution",
+                        "branch": "Branch",
                         "major": "Major",
                         "department": "Faculties",
                         "english_name": "Name",
@@ -144,7 +207,7 @@ def create_app(test_config=None):
                 (Path(folder) / "translations.json").write_text(json.dumps(overrides))
                 app.config["CONVERTER"](source, output, app.config["CONVERSION_TIMEOUT"])
                 if not output.is_file() or not 0 < output.stat().st_size <= 8 * 1024 * 1024:
-                    raise JobError("failed", 500)
+                    raise JobError("failed", 500, "worker produced no valid output PDF")
                 document = output.read_bytes()
             outcome = "success"
             response = send_file(
@@ -157,14 +220,17 @@ def create_app(test_config=None):
             return response
         except JobError as error:
             outcome = error.code
-            return failure(error.code, error.status)
+            details = error.details
+            return failure(error.code, error.status, details)
         except RequestEntityTooLarge:
             outcome = "too_large"
             raise
         except Exception:
+            outcome = "failed"
             return failure("failed", 500)
         finally:
             slot.release()
+            # Exception text and tracebacks can contain uploaded personal data.
             app.logger.info(
                 "conversion id=%s outcome=%s duration_ms=%d",
                 request_id,
